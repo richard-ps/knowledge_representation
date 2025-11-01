@@ -36,7 +36,6 @@ def to_cnf(input_path: str) -> Tuple[Iterable[Iterable[int]], int]:
     # print("Puzzle:", puzzle)
 
     N = len(puzzle)
-    b = int(math.isqrt(N))
     num_vars = N * N * N
 
     clauses = []
@@ -44,7 +43,7 @@ def to_cnf(input_path: str) -> Tuple[Iterable[Iterable[int]], int]:
     clauses += exactly_one_in_col(N) # (2) For each value v and each row r: exactly one column c has v
     clauses += exactly_one_in_row(N) # (3) For each value v and each column c: exactly one row r has v
     clauses += exactly_one_in_box(N) # (4) For each value v and each sqrt(N)×sqrt(N) box: exactly one cell has v
-    clauses += non_consecutive(N)    # (5) Non-consecutive: orthogonal neighbors cannot differ by 1
+    # clauses += non_consecutive(N)    # (5) Non-consecutive: orthogonal neighbors cannot differ by 1
     clauses += clues(puzzle, N)      # (6) Clues: unit clauses for the given puzzle
   
     print("Clauses after (6):", len(clauses))
