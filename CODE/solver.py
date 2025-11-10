@@ -40,9 +40,6 @@ def dpll_recursive(clauses, model=set()):
     
     # Branching Step
     literal = branching_step(clauses, model)
-
-    if literal == 0:
-        return "UNSAT", None
     
     model.add(literal)
     
