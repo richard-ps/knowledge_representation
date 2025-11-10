@@ -44,7 +44,22 @@ def main():
 
     print(status)
 
+    # model_negatives = set()
+    # model_positives = set()
+
+    # for literal in model:
+    #     if literal < 0:
+    #         model_negatives.add(-literal)
+    #     else:
+    #         model_positives.add(literal)
+
     string_model = ""
+
+    # for literal in sorted(model_negatives):
+    #     string_model += str(-literal) + " "
+
+    # for literal in sorted(model_positives):
+    #     string_model += str(literal) + " "
 
     if model is not None:
       for literal in model:
