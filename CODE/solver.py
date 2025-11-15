@@ -7,7 +7,6 @@ Implement: solve_cnf(clauses) -> (status, model_or_None)"""
 
 
 from typing import Iterable, List, Tuple
-#from xml.parsers.expat import model
 
 def solve_cnf(clauses: Iterable[Iterable[int]], num_vars: int) -> Tuple[str, List[int] | None]:
     """
@@ -25,38 +24,40 @@ def dpll_recursive(clauses, model=set()):
     clauses = remove_tautologies(clauses)
     # Unit Propagation
     clauses, model = unit_propagation(clauses, model)
-    print("Clauses after Unit Propagation:", len(clauses))
+    
+    if clauses is None:
+        return "UNSAT", None
+    
     # Pure Literal Elimination
     clauses, model = pure_literal_elimination(clauses, model)
-    print("Clauses after Pure Literal Elimination:", len(clauses))
 
      # SAT
     if clauses == []:
         return "SAT", model
     
     # UNSAT
-    if clauses == [[]]:
+    if is_empty(clauses):
         return "UNSAT", None
     
     # Branching Step
     literal = branching_step(clauses, model)
+    # literal = maximum_occurence_minimal(clauses, 3)
     
     model.add(literal)
     
-    sat, model = dpll_recursive(clauses , model)
+    sat, model2 = dpll_recursive(clauses , model)
 
     if sat == "SAT":
-        print("Found SAT by assigning literal:", literal)
-        return "SAT", sorted(model)
+        return "SAT", sorted(model2)
     else:
         model.remove(literal)
         model.add(-literal)
-        print("Backtracking on literal:", literal)
         sat, model = dpll_recursive(clauses , model)
         if sat == "SAT":
-            print("Found SAT by assigning literal:", -literal)
-            return "SAT", sorted(model)
+            return "SAT", model
         else:
+            print("UNSAT reached")
+            # model.remove(-literal)
             return "UNSAT", None
 
 def unit_propagation(clauses, model):
@@ -64,6 +65,10 @@ def unit_propagation(clauses, model):
 
     for clause in unit_clauses:
         literal = clause[0]
+
+        if -literal in model:
+            return None, model
+        
         model.add(literal)
         clauses = remove_literal(clauses, literal)
 
@@ -73,6 +78,44 @@ def unit_propagation(clauses, model):
                 clauses = remove_literal(clauses, literal)
     
     return clauses, model
+
+# MOM's (Maximum Occurrence in clauses of Minimum Size)
+def maximum_occurence_minimal(clauses, k):
+    literals = set()
+    count_x = {}
+    count_x_prime = {}
+    min_len = float("inf")
+    max_f = float("-inf")
+    max_literal = None
+    min_clauses = []
+    for clause in clauses:
+        if len(clause) < min_len and len(clause) != 1:
+            min_len = len(clause)
+    for clause in clauses:
+        if len(clause) == min_len:
+            min_clauses.append(clause)
+    for clause in clauses:
+        for literal in clause:
+            literals.add(literal)
+            if literal > 0:
+                if literal not in count_x:
+                    count_x[literal] = 1
+                else:
+                    count_x[literal] += 1
+            else:
+                if literal not in count_x_prime:
+                    count_x_prime[literal] = 1
+                else:
+                    count_x_prime[literal] += 1
+    for literal in literals:
+        x = count_x.get(literal, 0)
+        x_prime = count_x_prime.get(literal, 0)
+        f_x = (x + x_prime)*2^k + x * x_prime
+        if f_x > max_f:
+            max_f = f_x
+            max_literal = literal
+    
+    return max_literal
 
 # DLCS (Dynamic Largest Combined Sum)
 def branching_step(clauses, model):
@@ -103,9 +146,6 @@ def branching_step(clauses, model):
         if combined_sum > max_sum:
             max_sum = combined_sum
             max_literal = literal
-
-    print("Branching on literal:", max_literal)
-    print("Max combined sum:", max_sum)
         
     return max_literal
             
@@ -125,8 +165,8 @@ def remove_literal(clauses, literal):
             new_clauses.append(clause)
         if -1*literal in clause:
             new_clause = [lit for lit in clause if lit != -literal]
-            if new_clause != []:
-                new_clauses.append(new_clause)
+            # if new_clause != []:
+            new_clauses.append(new_clause)
         
     return new_clauses
 
@@ -150,3 +190,9 @@ def pure_literal_elimination(clauses, model):
         clauses = remove_literal(clauses, pure_literal)
 
     return clauses, model
+
+def is_empty(clauses):
+    for clause in clauses:
+        if clause == []:
+            return True
+    return False

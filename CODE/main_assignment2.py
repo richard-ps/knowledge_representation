@@ -17,6 +17,7 @@ Behavior:
 """
 
 import argparse
+import time
 from typing import Tuple, Iterable
 from encoder import to_cnf
 from solver import solve_cnf
@@ -29,43 +30,38 @@ def parse_args():
 
 def main():
 
-    # args = parse_args()
+    args = parse_args()
 
-    # if(args.sat):
-      # clauses, num_vars = parse_dimacs(args.inp)
-    #clauses, num_vars = parse_dimacs("/Users/richard/Documents/MSc Artificial Inteligence /assignments/knowledge representation/SAT Project - Assignment 2 - Files/EXAMPLE puzzles (input)/slides_example.cnf")
-    clauses, num_vars = parse_dimacs("/Users/richard/Documents/MSc Artificial Inteligence /assignments/knowledge representation/SAT Project - Assignment 2 - Files/EXAMPLE puzzles (input)/DIMACS_9.cnf")
-    #clauses, num_vars = parse_dimacs("/Users/richard/Documents/MSc Artificial Inteligence /assignments/knowledge representation/SAT Project - Assignment 2 - Files/EXAMPLE puzzles (input)/teste.cnf")
+    if(args.sat):
+      clauses, num_vars = parse_dimacs(args.inp)
+    
+    else:
+      clauses, num_vars = to_cnf(args.inp)
 
-    # else:
-    #   clauses, num_vars = to_cnf(args.inp)
+    # clauses, num_vars = parse_dimacs("/Users/richard/Documents/MSc Artificial Inteligence /assignments/knowledge representation/SAT Project Assignment 1 - Files/EXAMPLE puzzles (input)/slides_example.cnf")
+    #clauses, num_vars = to_cnf("/Users/richard/Documents/MSc Artificial Inteligence /assignments/knowledge representation/SAT Project Assignment 1 - Files/EXAMPLE puzzles (input)/example_n16.txt")
+
+
+    # get the start time
+    # st = time.time()
 
     status, model = solve_cnf(clauses, num_vars)
 
+    # et = time.time()
+
+    # # get the execution time
+    # elapsed_time = et - st
+    # print('Execution time:', elapsed_time, 'seconds')
+
     print(status)
 
-    # model_negatives = set()
-    # model_positives = set()
+    # string_model = ""
 
-    # for literal in model:
-    #     if literal < 0:
-    #         model_negatives.add(-literal)
-    #     else:
-    #         model_positives.add(literal)
+    # if model is not None:
+    #   for literal in model:
+    #       string_model += str(literal) + " "
 
-    string_model = ""
-
-    # for literal in sorted(model_negatives):
-    #     string_model += str(-literal) + " "
-
-    # for literal in sorted(model_positives):
-    #     string_model += str(literal) + " "
-
-    if model is not None:
-      for literal in model:
-          string_model += str(literal) + " "
-
-    print(string_model.strip())
+    # print(string_model.strip())
 
 
 def parse_dimacs(input_path: str) -> Tuple[Iterable[Iterable[int]], int]:
