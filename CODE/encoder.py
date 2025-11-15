@@ -46,7 +46,7 @@ def to_cnf(input_path: str) -> Tuple[Iterable[Iterable[int]], int]:
     clauses += non_consecutive(N)    # (5) Non-consecutive: orthogonal neighbors cannot differ by 1
     clauses += clues(puzzle, N)      # (6) Clues: unit clauses for the given puzzle
   
-    print("Clauses after (6):", len(clauses))
+    #print("Clauses after (6):", len(clauses))
     # print("Clauses: ", clauses)
 
     return clauses, num_vars
